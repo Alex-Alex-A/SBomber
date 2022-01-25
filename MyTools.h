@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 #include <string>
+//#include <fstream>
+
 
 namespace MyTools {
 
@@ -40,16 +42,70 @@ namespace MyTools {
 
 	//=============================================================================================
 
-	void __fastcall OpenLogFile(const std::string& FN);
+	//void __fastcall OpenLogFile(const std::string& FN);
 
-	void CloseLogFile();
+	//void CloseLogFile();
 
-	void __fastcall WriteToLog(const std::string& str);
+	//void __fastcall WriteToLog(const std::string& str);
 
-	void __fastcall WriteToLog(const std::string& str, int n);
+	//void __fastcall WriteToLog(const std::string& str, int n);
 
-	void __fastcall WriteToLog(const std::string& str, double d);
+	//void __fastcall WriteToLog(const std::string& str, double d);
 
 	//=============================================================================================
 
+    class FileLoggerSingleton         // реализация Singleton   ;     реализация методов - в MyTools.cpp
+    {                                 // в файлах SBomber.cpp и SBomberProject.cpp вызова типа:
+    public:                           // "MyTools::FileLoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");"
+        static FileLoggerSingleton& getInstance()
+        {
+            static FileLoggerSingleton theInstance;
+            return theInstance;
+        }
+
+        void __fastcall OpenLogFile(const std::string& FN);
+        void CloseLogFile();
+        void __fastcall WriteToLog(const std::string& str);
+        void __fastcall WriteToLog(const std::string& str, int n);
+        void __fastcall WriteToLog(const std::string& str, double d);
+
+    private:
+        FileLoggerSingleton() { }
+        FileLoggerSingleton(const FileLoggerSingleton& root) = delete;
+        FileLoggerSingleton& operator=(const FileLoggerSingleton&) = delete;
+    };
+
+    //=============================================================================================
+
+    class LoggerSingleton         // реализация Proxy, "обёртка" для FileLoggerSingleton   ;     реализация методов - в MyTools.cpp
+    {                             // в файлах SBomber.cpp и SBomberProject.cpp вызова типа:
+    public:                       // "MyTools::LoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");"
+        static int n_page;
+        static LoggerSingleton& getInstance()
+        {
+            static LoggerSingleton theInstance;
+            return theInstance;
+        }
+
+        void __fastcall OpenLogFile(const std::string& FN) { FileLoggerSingleton::getInstance().OpenLogFile(FN); }
+        void CloseLogFile() { FileLoggerSingleton::getInstance().CloseLogFile(); }
+
+        void __fastcall WriteToLog(const std::string str);
+        void __fastcall WriteToLog(const std::string str, int n);
+        void __fastcall WriteToLog(const std::string str, double d);
+
+    private:
+        LoggerSingleton() { }
+        LoggerSingleton(const LoggerSingleton& root) = delete;
+        LoggerSingleton& operator=(const LoggerSingleton&) = delete;
+
+        std::string get_note_number() {  // получаем номер записи, затем пребразовываем в строку и инкрименируем
+            std::string nump = std::to_string(n_page);
+            ++n_page;
+            return nump;
+        }
+
+    };
+
+    //=============================================================================================
 };
