@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
+//#include <thread>
 
 #include "MyTools.h"
 
@@ -21,6 +22,7 @@ namespace MyTools {
 
     void ClrScr()
     {
+        //std::this_thread::sleep_for(100ms);
         system("cls");
     }
 

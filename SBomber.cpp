@@ -126,6 +126,7 @@ void SBomber::CheckPlaneAndLevelGUI()
 
 void SBomber::CheckBombsAndGround() 
 {
+    DeleteDynamicObjCommand* ddo;                             ///////////////////////////////////
     vector<Bomb*> vecBombs = FindAllBombs();
     Ground* pGround = FindGround();
     const double y = pGround->GetY();
@@ -135,7 +136,9 @@ void SBomber::CheckBombsAndGround()
         {
             pGround->AddCrater(vecBombs[i]->GetX());
             CheckDestoyableObjects(vecBombs[i]);
-            DeleteDynamicObj(vecBombs[i]);
+            //DeleteDynamicObj(vecBombs[i]);                        //// старый вариант
+            ddo = new DeleteDynamicObjCommand(this, vecBombs[i]);   //////////////     применяем паттерн Command
+            delete ddo;                                             //////////////
         }
     }
 
@@ -143,6 +146,7 @@ void SBomber::CheckBombsAndGround()
 
 void SBomber::CheckDestoyableObjects(Bomb * pBomb)
 {
+    DeleteStaticObjCommand* dso;                             ////////////////////////////////////
     vector<DestroyableGroundObject*> vecDestoyableObjects = FindDestoyableGroundObjects();
     const double size = pBomb->GetWidth();
     const double size_2 = size / 2;
@@ -153,33 +157,9 @@ void SBomber::CheckDestoyableObjects(Bomb * pBomb)
         if (vecDestoyableObjects[i]->isInside(x1, x2))
         {
             score += vecDestoyableObjects[i]->GetScore();
-            DeleteStaticObj(vecDestoyableObjects[i]);
-        }
-    }
-}
-
-void SBomber::DeleteDynamicObj(DynamicObject* pObj)
-{
-    auto it = vecDynamicObj.begin();
-    for (; it != vecDynamicObj.end(); it++)
-    {
-        if (*it == pObj)
-        {
-            vecDynamicObj.erase(it);
-            break;
-        }
-    }
-}
-
-void SBomber::DeleteStaticObj(GameObject* pObj)
-{
-    auto it = vecStaticObj.begin();
-    for (; it != vecStaticObj.end(); it++)
-    {
-        if (*it == pObj)
-        {
-            vecStaticObj.erase(it);
-            break;
+            //DeleteStaticObj(vecDestoyableObjects[i]);                        //// старый вариант
+            dso = new DeleteStaticObjCommand(this, vecDestoyableObjects[i]);   /////////////////////     применяем паттерн Command
+            delete dso;                                                        /////////////////////
         }
     }
 }
@@ -272,6 +252,7 @@ LevelGUI* SBomber::FindLevelGUI() const
 void SBomber::ProcessKBHit()
 {
     int c = _getch();
+    DropBombCommand dbc(this);
 
     if (c == 224)
     {
@@ -296,11 +277,13 @@ void SBomber::ProcessKBHit()
         break;
 
     case 'b':
-        DropBomb();
+        //DropBomb();
+        dbc.execute();
         break;
 
     case 'B':
-        DropBomb();
+        //DropBomb();
+        dbc.execute();
         break;
 
     default:
@@ -363,7 +346,10 @@ void SBomber::DropBomb()
         double x = pPlane->GetX() + 4;
         double y = pPlane->GetY() + 2;
 
-        Bomb* pBomb = new Bomb;
+        //Bomb* pBomb = new Bomb;          // "старый" вид бомб
+        BombDecoratorNewDraw* pBomb1 = new BombDecoratorNewDraw(new Bomb);   // "новый" вид бомб с другой прорисовкой
+        BombDecoratorNewSpeed* pBomb = new BombDecoratorNewSpeed(pBomb1);       // "новый" вид бомб с другой скоростью
+
         pBomb->SetDirection(0.3, 1);
         pBomb->SetSpeed(2);
         pBomb->SetPos(x, y);
@@ -372,5 +358,32 @@ void SBomber::DropBomb()
         vecDynamicObj.push_back(pBomb);
         bombsNumber--;
         score -= Bomb::BombCost;
+    }
+}
+
+
+void SBomber::DeleteDynamicObj(DynamicObject* pObj)
+{
+    auto it = vecDynamicObj.begin();
+    for (; it != vecDynamicObj.end(); it++)
+    {
+        if (*it == pObj)
+        {
+            vecDynamicObj.erase(it);
+            break;
+        }
+    }
+}
+
+void SBomber::DeleteStaticObj(GameObject* pObj)
+{
+    auto it = vecStaticObj.begin();
+    for (; it != vecStaticObj.end(); it++)
+    {
+        if (*it == pObj)
+        {
+            vecStaticObj.erase(it);
+            break;
+        }
     }
 }
