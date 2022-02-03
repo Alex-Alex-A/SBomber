@@ -207,16 +207,31 @@ Ground* SBomber::FindGround() const
 
 vector<Bomb*> SBomber::FindAllBombs() const
 {
-    vector<Bomb*> vecBombs;
+    std::vector<Bomb*> vecBombs;
+    ArrIterator<DynamicObject*, Bomb*> ait(vecDynamicObj);  // 1-й параметр шаблона - откуда берём объекты ,  2-й - куда складываем
 
-    for (size_t i = 0; i < vecDynamicObj.size(); i++)
+    Bomb* bom = nullptr;
+    while (true)
     {
-        Bomb* pBomb = dynamic_cast<Bomb*>(vecDynamicObj[i]);
-        if (pBomb != nullptr)
-        {
-            vecBombs.push_back(pBomb);
-        }
+        bom = ait.get();
+   
+        if (bom)
+            vecBombs.push_back(bom);
+        
+        ait.next();
+        
+        if (ait.is_end())
+            break;
     }
+
+    //for (size_t i = 0; i < vecDynamicObj.size(); i++)
+    //{
+    //    Bomb* pBomb = dynamic_cast<Bomb*>(vecDynamicObj[i]);
+    //    if (pBomb != nullptr)
+    //    {
+    //        vecBombs.push_back(pBomb);
+    //    }
+    //}
 
     return vecBombs;
 }

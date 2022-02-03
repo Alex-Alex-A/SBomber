@@ -104,3 +104,53 @@ public:
 };
 
 
+template <typename T>
+class IIterator {              // абстрактный итератор
+protected:
+    std::vector<T> arr;
+    int index;
+    int size;
+
+public:
+    virtual T get() const = 0;
+    virtual void next() = 0;
+    virtual bool operator!=(const T) = 0;
+    virtual bool is_end() = 0;
+};
+
+
+
+template <typename T, typename C> 
+class ArrIterator : public IIterator<T> {               // итератор , сделанный конкретно под SBomber
+public:
+    ArrIterator(std::vector<T> _arr) : IIterator<T>() {
+        this->arr = _arr;
+        this->index = 0;
+        this->size = this->arr.size();
+    }
+
+    virtual C get() const override {
+        T obj = this->index < this->size ? this->arr[this->index] : nullptr;
+        return dynamic_cast<C>(obj);
+    }
+
+    void next() override {
+        this->index++;
+    }
+
+    virtual bool is_end() {
+        return this->index >= this->size;
+    }
+
+    virtual bool operator!=(const T t2) override {
+        return dynamic_cast<T>(t2) != get();
+    }
+
+ };
+
+
+
+
+
+
+
