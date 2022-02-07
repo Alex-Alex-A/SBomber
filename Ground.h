@@ -27,20 +27,55 @@ private:
 
 //=============================================================================================================
 
-class Ground : public GameObject
+class GroundCommon : public GameObject {                   // абстрактный класс "земли"
+protected:
+	std::vector<Crater> vecCrates;
+public:
+	GroundCommon() { }
+
+	virtual void Draw() const = 0;
+
+	void AddCrater(double xn);
+
+	bool __fastcall isInsideAnyCrater(double x) const;
+};
+
+//=============================================================================================================
+
+class Ground : public GroundCommon                         // класс простой "земли"
 {
 public:
 
 	Ground() { }
-
 	void Draw() const override;
-
-	void __fastcall AddCrater(double xn);
-
-private:
-
-	bool __fastcall isInsideAnyCrater(double x) const;
-
-	std::vector<Crater> vecCrates;
 };
+
+//=============================================================================================================
+
+class WinterGround : public GroundCommon                   // класс зимней "земли"
+{
+public:
+
+	WinterGround() { }
+	void Draw() const override;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -38,7 +38,7 @@ private:
     void CheckBombsAndGround();
     void __fastcall CheckDestoyableObjects(Bomb* pBomb);
 
-    Ground * FindGround() const;
+    GroundCommon* FindGround() const;
     Plane * FindPlane() const;
     LevelGUI * FindLevelGUI() const;
     std::vector<DestroyableGroundObject*> FindDestoyableGroundObjects() const;
@@ -52,7 +52,7 @@ private:
 };
 
 
-class Command {         /////////////////////  паттерн Command (абстрактный класс Command)
+class Command {         /////////////////////  РїР°С‚С‚РµСЂРЅ Command (Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ РєР»Р°СЃСЃ Command)
 protected:
     SBomber* _sb;
     Command(SBomber* sb) : _sb(sb) {}
@@ -63,7 +63,7 @@ public:
 };
 
 
-class DeleteDynamicObjCommand : public Command {     ////////  описываем   DeleteDynamicObjCommand ,  реализация в файле SBomber.cpp в функции  CheckBombsAndGround
+class DeleteDynamicObjCommand : public Command {     ////////  РѕРїРёСЃС‹РІР°РµРј   DeleteDynamicObjCommand ,  СЂРµР°Р»РёР·Р°С†РёСЏ РІ С„Р°Р№Р»Рµ SBomber.cpp РІ С„СѓРЅРєС†РёРё  CheckBombsAndGround
     std::vector<DynamicObject*> _vecDynamicObj;
     DynamicObject* _pBomb;
 public:
@@ -78,7 +78,7 @@ public:
 };
 
 
-class DeleteStaticObjCommand : public Command {       ////////  описываем   DeleteStaticObjCommand ,  реализация в файле SBomber.cpp в функции  CheckDestoyableObjects
+class DeleteStaticObjCommand : public Command {       ////////  РѕРїРёСЃС‹РІР°РµРј   DeleteStaticObjCommand ,  СЂРµР°Р»РёР·Р°С†РёСЏ РІ С„Р°Р№Р»Рµ SBomber.cpp РІ С„СѓРЅРєС†РёРё  CheckDestoyableObjects
     std::vector<GameObject*> _vecStaticObj;
     GameObject* _pObj;
 public:
@@ -93,7 +93,7 @@ public:
 };
 
 
-class DropBombCommand : public Command {              ////////  описываем   DropBombCheckBombsAndGround ,  реализация в файле SBomber.cpp в функции ProcessKBHit()
+class DropBombCommand : public Command {              ////////  РѕРїРёСЃС‹РІР°РµРј   DropBombCheckBombsAndGround ,  СЂРµР°Р»РёР·Р°С†РёСЏ РІ С„Р°Р№Р»Рµ SBomber.cpp РІ С„СѓРЅРєС†РёРё ProcessKBHit()
 public:
     DropBombCommand(SBomber* sb) /* : Command(sb) */ {
         _sb = sb;
@@ -105,7 +105,7 @@ public:
 
 
 template <typename T>
-class IIterator {              // абстрактный итератор
+class IIterator {              // Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ РёС‚РµСЂР°С‚РѕСЂ
 protected:
     std::vector<T> arr;
     int index;
@@ -121,7 +121,7 @@ public:
 
 
 template <typename T, typename C> 
-class ArrIterator : public IIterator<T> {               // итератор , сделанный конкретно под SBomber
+class ArrIterator : public IIterator<T> {               // РёС‚РµСЂР°С‚РѕСЂ , СЃРґРµР»Р°РЅРЅС‹Р№ РєРѕРЅРєСЂРµС‚РЅРѕ РїРѕРґ SBomber
 public:
     ArrIterator(std::vector<T> _arr) : IIterator<T>() {
         this->arr = _arr;
@@ -147,8 +147,6 @@ public:
     }
 
  };
-
-
 
 
 

@@ -10,7 +10,7 @@ using namespace MyTools;
 
 void Crater::Draw() const
 {
-    if (width == SMALL_CRATER_SIZE) // Рисование воронки в 9 символов шириной
+    if (width == SMALL_CRATER_SIZE) // Р РёСЃРѕРІР°РЅРёРµ РІРѕСЂРѕРЅРєРё РІ 9 СЃРёРјРІРѕР»РѕРІ С€РёСЂРёРЅРѕР№
     {
         GotoXY(x - 4, y + 1);
         cout << "==     ==";
@@ -73,7 +73,7 @@ void Ground::Draw() const
     delete[] buf;
 }
 
-bool Ground::isInsideAnyCrater(double x) const
+bool GroundCommon::isInsideAnyCrater(double x) const
 {
     bool isInside = false;
     for (size_t i = 0; i < vecCrates.size(); i++)
@@ -88,10 +88,57 @@ bool Ground::isInsideAnyCrater(double x) const
     return isInside;
 }
 
-void Ground::AddCrater(double xn)
+void GroundCommon::AddCrater(double xn)
 {
     Crater cr;
     cr.SetPos(int(xn), y);
     cr.SetWidth(SMALL_CRATER_SIZE);
     vecCrates.push_back(cr);
 }
+
+//==================================================================================================
+
+void WinterGround::Draw() const
+{
+    MyTools::SetColor(CC_Green);
+
+    const size_t bufSize = width + 1;
+    char* buf = new (nothrow) char[bufSize];
+    if (buf == nullptr)
+    {
+        return;
+    }
+
+    if (vecCrates.size() == 0)
+    {
+        GotoXY(x, y);
+        memset(buf, '%', bufSize);
+        buf[bufSize - 1] = '\0';
+        cout << buf;
+    }
+    else
+    {
+        const size_t X = size_t(x);
+        char c;
+        for (size_t i = X; i < width + X; i++)
+        {
+            c = (isInsideAnyCrater((double)i)) ? ' ' : '%';
+            buf[i - X] = c;
+        }
+
+        GotoXY((double)X, y);
+        buf[bufSize - 1] = '\0';
+        cout << buf;
+
+        for (size_t i = 0; i < vecCrates.size(); i++)
+        {
+            vecCrates[i].Draw();
+        }
+    }
+
+    delete[] buf;
+}
+
+
+
+

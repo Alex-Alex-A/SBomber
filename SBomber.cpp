@@ -1,4 +1,3 @@
-
 #include <conio.h>
 #include <windows.h>
 
@@ -43,7 +42,14 @@ SBomber::SBomber()
     pGUI->SetFinishX(offset + width - 4);
     vecStaticObj.push_back(pGUI);
 
-    Ground* pGr = new Ground;
+//#define WINTERGROUND
+
+#ifdef WINTERGROUND   // Р·Р°РєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ РґР»СЏ Р·Р°РјРµРЅС‹ Р·РµРјР»Рё
+    GroundCommon* pGr = new WinterGround;
+#else
+    GroundCommon* pGr = new Ground;
+#endif
+
     const uint16_t groundY = maxY - 5;
     pGr->SetPos(offset + 1, groundY);
     pGr->SetWidth(width - 2);
@@ -59,10 +65,38 @@ SBomber::SBomber()
     pTank->SetPos(50, groundY - 1);
     vecStaticObj.push_back(pTank);
 
-    House * pHouse = new House;
-    pHouse->SetWidth(13);
-    pHouse->SetPos(80, groundY - 1);
-    vecStaticObj.push_back(pHouse);
+    //House * pHouse = new House;
+    //pHouse->SetWidth(13);
+    //pHouse->SetPos(80, groundY - 1);
+    //vecStaticObj.push_back(pHouse);
+
+    Director<GameObject*> dr;
+
+    string str;
+    cout << "Do you want a house body to be drawn? (y/n)" << endl;
+    cin >> str;
+
+    if (str == "y") {
+        HouseBody* bdb = new HouseBody(80, groundY - 1, 13);
+        dr.Add(bdb);
+    }
+
+    cout << "Do you want a house chimney to be drawn? (y/n)" << endl;
+    cin >> str;
+    if (str == "y") {
+        HouseChimney* bch = new HouseChimney(80, groundY - 1, 13);
+        dr.Add(bch);
+    }
+
+    cout << "Do you want a house window to be drawn? (y/n)" << endl;
+    cin >> str;
+    if (str == "y") {
+        HouseWindow* bw = new HouseWindow(80, groundY - 1, 13);
+        dr.Add(bw);
+    }
+
+    dr.Apply(vecStaticObj);
+
 
     /*
     Bomb* pBomb = new Bomb;
@@ -128,16 +162,16 @@ void SBomber::CheckBombsAndGround()
 {
     DeleteDynamicObjCommand* ddo;                             ///////////////////////////////////
     vector<Bomb*> vecBombs = FindAllBombs();
-    Ground* pGround = FindGround();
+    GroundCommon* pGround = FindGround();
     const double y = pGround->GetY();
     for (size_t i = 0; i < vecBombs.size(); i++)
     {
-        if (vecBombs[i]->GetY() >= y) // Пересечение бомбы с землей
+        if (vecBombs[i]->GetY() >= y) // РџРµСЂРµСЃРµС‡РµРЅРёРµ Р±РѕРјР±С‹ СЃ Р·РµРјР»РµР№
         {
             pGround->AddCrater(vecBombs[i]->GetX());
             CheckDestoyableObjects(vecBombs[i]);
-            //DeleteDynamicObj(vecBombs[i]);                        //// старый вариант
-            ddo = new DeleteDynamicObjCommand(this, vecBombs[i]);   //////////////     применяем паттерн Command
+            //DeleteDynamicObj(vecBombs[i]);                        //// СЃС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚
+            ddo = new DeleteDynamicObjCommand(this, vecBombs[i]);   //////////////     РїСЂРёРјРµРЅСЏРµРј РїР°С‚С‚РµСЂРЅ Command
             delete ddo;                                             //////////////
         }
     }
@@ -157,8 +191,8 @@ void SBomber::CheckDestoyableObjects(Bomb * pBomb)
         if (vecDestoyableObjects[i]->isInside(x1, x2))
         {
             score += vecDestoyableObjects[i]->GetScore();
-            //DeleteStaticObj(vecDestoyableObjects[i]);                        //// старый вариант
-            dso = new DeleteStaticObjCommand(this, vecDestoyableObjects[i]);   /////////////////////     применяем паттерн Command
+            //DeleteStaticObj(vecDestoyableObjects[i]);                        //// СЃС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚
+            dso = new DeleteStaticObjCommand(this, vecDestoyableObjects[i]);   /////////////////////     РїСЂРёРјРµРЅСЏРµРј РїР°С‚С‚РµСЂРЅ Command
             delete dso;                                                        /////////////////////
         }
     }
@@ -189,13 +223,13 @@ vector<DestroyableGroundObject*> SBomber::FindDestoyableGroundObjects() const
     return vec;
 }
 
-Ground* SBomber::FindGround() const
+GroundCommon* SBomber::FindGround() const
 {
-    Ground* pGround;
+    GroundCommon* pGround;
 
     for (size_t i = 0; i < vecStaticObj.size(); i++)
     {
-        pGround = dynamic_cast<Ground *>(vecStaticObj[i]);
+        pGround = dynamic_cast<GroundCommon*>(vecStaticObj[i]);
         if (pGround != nullptr)
         {
             return pGround;
@@ -208,7 +242,7 @@ Ground* SBomber::FindGround() const
 vector<Bomb*> SBomber::FindAllBombs() const
 {
     std::vector<Bomb*> vecBombs;
-    ArrIterator<DynamicObject*, Bomb*> ait(vecDynamicObj);  // 1-й параметр шаблона - откуда берём объекты ,  2-й - куда складываем
+    ArrIterator<DynamicObject*, Bomb*> ait(vecDynamicObj);  // 1-Р№ РїР°СЂР°РјРµС‚СЂ С€Р°Р±Р»РѕРЅР° - РѕС‚РєСѓРґР° Р±РµСЂС‘Рј РѕР±СЉРµРєС‚С‹ ,  2-Р№ - РєСѓРґР° СЃРєР»Р°РґС‹РІР°РµРј
 
     Bomb* bom = nullptr;
     while (true)
@@ -361,9 +395,9 @@ void SBomber::DropBomb()
         double x = pPlane->GetX() + 4;
         double y = pPlane->GetY() + 2;
 
-        //Bomb* pBomb = new Bomb;          // "старый" вид бомб
-        BombDecoratorNewDraw* pBomb1 = new BombDecoratorNewDraw(new Bomb);   // "новый" вид бомб с другой прорисовкой
-        BombDecoratorNewSpeed* pBomb = new BombDecoratorNewSpeed(pBomb1);       // "новый" вид бомб с другой скоростью
+        //Bomb* pBomb = new Bomb;          // "СЃС‚Р°СЂС‹Р№" РІРёРґ Р±РѕРјР±
+        BombDecoratorNewDraw* pBomb1 = new BombDecoratorNewDraw(new Bomb);   // "РЅРѕРІС‹Р№" РІРёРґ Р±РѕРјР± СЃ РґСЂСѓРіРѕР№ РїСЂРѕСЂРёСЃРѕРІРєРѕР№
+        BombDecoratorNewSpeed* pBomb = new BombDecoratorNewSpeed(pBomb1);       // "РЅРѕРІС‹Р№" РІРёРґ Р±РѕРјР± СЃ РґСЂСѓРіРѕР№ СЃРєРѕСЂРѕСЃС‚СЊСЋ
 
         pBomb->SetDirection(0.3, 1);
         pBomb->SetSpeed(2);
