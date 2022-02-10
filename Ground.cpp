@@ -10,7 +10,7 @@ using namespace MyTools;
 
 void Crater::Draw() const
 {
-    if (width == SMALL_CRATER_SIZE) // Р РёСЃРѕРІР°РЅРёРµ РІРѕСЂРѕРЅРєРё РІ 9 СЃРёРјРІРѕР»РѕРІ С€РёСЂРёРЅРѕР№
+    if (width == SMALL_CRATER_SIZE) // Рисование воронки в 9 символов шириной
     {
         GotoXY(x - 4, y + 1);
         cout << "==     ==";

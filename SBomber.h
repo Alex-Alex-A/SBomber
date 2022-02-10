@@ -32,6 +32,10 @@ public:
     std::vector<DynamicObject*> vecDynamicObj;
     std::vector<GameObject*> vecStaticObj;
 
+    std::vector<DestroyableGroundObject*> FindDestoyableGroundObjects() const;
+
+    int16_t score;
+
 private:
 
     void CheckPlaneAndLevelGUI();
@@ -39,20 +43,18 @@ private:
     void __fastcall CheckDestoyableObjects(Bomb* pBomb);
 
     GroundCommon* FindGround() const;
-    Plane * FindPlane() const;
+    Plane* FindPlane() const;
     LevelGUI * FindLevelGUI() const;
-    std::vector<DestroyableGroundObject*> FindDestoyableGroundObjects() const;
     std::vector<Bomb*> FindAllBombs() const;
     
     bool exitFlag;
 
     uint64_t startTime, finishTime, passedTime;
     uint16_t bombsNumber, deltaTime, fps;
-    int16_t score;
 };
 
 
-class Command {         /////////////////////  РїР°С‚С‚РµСЂРЅ Command (Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ РєР»Р°СЃСЃ Command)
+class Command {         /////////////////////  паттерн Command (абстрактный класс Command)
 protected:
     SBomber* _sb;
     Command(SBomber* sb) : _sb(sb) {}
@@ -63,7 +65,7 @@ public:
 };
 
 
-class DeleteDynamicObjCommand : public Command {     ////////  РѕРїРёСЃС‹РІР°РµРј   DeleteDynamicObjCommand ,  СЂРµР°Р»РёР·Р°С†РёСЏ РІ С„Р°Р№Р»Рµ SBomber.cpp РІ С„СѓРЅРєС†РёРё  CheckBombsAndGround
+class DeleteDynamicObjCommand : public Command {     ////////  описываем   DeleteDynamicObjCommand ,  реализация в файле SBomber.cpp в функции  CheckBombsAndGround
     std::vector<DynamicObject*> _vecDynamicObj;
     DynamicObject* _pBomb;
 public:
@@ -78,7 +80,7 @@ public:
 };
 
 
-class DeleteStaticObjCommand : public Command {       ////////  РѕРїРёСЃС‹РІР°РµРј   DeleteStaticObjCommand ,  СЂРµР°Р»РёР·Р°С†РёСЏ РІ С„Р°Р№Р»Рµ SBomber.cpp РІ С„СѓРЅРєС†РёРё  CheckDestoyableObjects
+class DeleteStaticObjCommand : public Command {       ////////  описываем   DeleteStaticObjCommand ,  реализация в файле SBomber.cpp в функции  CheckDestoyableObjects
     std::vector<GameObject*> _vecStaticObj;
     GameObject* _pObj;
 public:
@@ -93,7 +95,7 @@ public:
 };
 
 
-class DropBombCommand : public Command {              ////////  РѕРїРёСЃС‹РІР°РµРј   DropBombCheckBombsAndGround ,  СЂРµР°Р»РёР·Р°С†РёСЏ РІ С„Р°Р№Р»Рµ SBomber.cpp РІ С„СѓРЅРєС†РёРё ProcessKBHit()
+class DropBombCommand : public Command {              ////////  описываем   DropBombCheckBombsAndGround ,  реализация в файле SBomber.cpp в функции ProcessKBHit()
 public:
     DropBombCommand(SBomber* sb) /* : Command(sb) */ {
         _sb = sb;
@@ -105,7 +107,7 @@ public:
 
 
 template <typename T>
-class IIterator {              // Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ РёС‚РµСЂР°С‚РѕСЂ
+class IIterator {              // абстрактный итератор
 protected:
     std::vector<T> arr;
     int index;
@@ -121,7 +123,7 @@ public:
 
 
 template <typename T, typename C> 
-class ArrIterator : public IIterator<T> {               // РёС‚РµСЂР°С‚РѕСЂ , СЃРґРµР»Р°РЅРЅС‹Р№ РєРѕРЅРєСЂРµС‚РЅРѕ РїРѕРґ SBomber
+class ArrIterator : public IIterator<T> {               // итератор , сделанный конкретно под SBomber
 public:
     ArrIterator(std::vector<T> _arr) : IIterator<T>() {
         this->arr = _arr;

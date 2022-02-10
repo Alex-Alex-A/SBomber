@@ -1,3 +1,4 @@
+
 #include <conio.h>
 #include <windows.h>
 
@@ -44,7 +45,7 @@ SBomber::SBomber()
 
 //#define WINTERGROUND
 
-#ifdef WINTERGROUND   // Р·Р°РєРѕРјРјРµРЅС‚РёСЂРѕРІР°С‚СЊ РґР»СЏ Р·Р°РјРµРЅС‹ Р·РµРјР»Рё
+#ifdef WINTERGROUND   // закомментировать для замены земли
     GroundCommon* pGr = new WinterGround;
 #else
     GroundCommon* pGr = new Ground;
@@ -132,11 +133,14 @@ void SBomber::MoveObjects()
     //MyTools::FileLoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");
     MyTools::LoggerSingleton::getInstance().WriteToLog(string(__FUNCTION__) + " was invoked");
 
+    LogVisitor lv;
+
     for (size_t i = 0; i < vecDynamicObj.size(); i++)
     {
         if (vecDynamicObj[i] != nullptr)
         {
             vecDynamicObj[i]->Move(deltaTime);
+            vecDynamicObj[i]->Accept(lv);
         }
     }
 };
@@ -166,19 +170,20 @@ void SBomber::CheckBombsAndGround()
     const double y = pGround->GetY();
     for (size_t i = 0; i < vecBombs.size(); i++)
     {
-        if (vecBombs[i]->GetY() >= y) // РџРµСЂРµСЃРµС‡РµРЅРёРµ Р±РѕРјР±С‹ СЃ Р·РµРјР»РµР№
+        if (vecBombs[i]->GetY() >= y) // Пересечение бомбы с землей
         {
             pGround->AddCrater(vecBombs[i]->GetX());
             CheckDestoyableObjects(vecBombs[i]);
-            //DeleteDynamicObj(vecBombs[i]);                        //// СЃС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚
-            ddo = new DeleteDynamicObjCommand(this, vecBombs[i]);   //////////////     РїСЂРёРјРµРЅСЏРµРј РїР°С‚С‚РµСЂРЅ Command
-            delete ddo;                                             //////////////
+            DeleteDynamicObj(vecBombs[i]);                        //// старый вариант
+            //ddo = new DeleteDynamicObjCommand(this, vecBombs[i]);   //////////////     применяем паттерн Command
+            //delete ddo;                                             //////////////
         }
     }
 
 }
 
-void SBomber::CheckDestoyableObjects(Bomb * pBomb)
+
+void SBomber::CheckDestoyableObjects(Bomb* pBomb)
 {
     DeleteStaticObjCommand* dso;                             ////////////////////////////////////
     vector<DestroyableGroundObject*> vecDestoyableObjects = FindDestoyableGroundObjects();
@@ -191,12 +196,13 @@ void SBomber::CheckDestoyableObjects(Bomb * pBomb)
         if (vecDestoyableObjects[i]->isInside(x1, x2))
         {
             score += vecDestoyableObjects[i]->GetScore();
-            //DeleteStaticObj(vecDestoyableObjects[i]);                        //// СЃС‚Р°СЂС‹Р№ РІР°СЂРёР°РЅС‚
-            dso = new DeleteStaticObjCommand(this, vecDestoyableObjects[i]);   /////////////////////     РїСЂРёРјРµРЅСЏРµРј РїР°С‚С‚РµСЂРЅ Command
+            //DeleteStaticObj(vecDestoyableObjects[i]);                        //// старый вариант
+            dso = new DeleteStaticObjCommand(this, vecDestoyableObjects[i]);   /////////////////////     применяем паттерн Command
             delete dso;                                                        /////////////////////
         }
     }
 }
+
 
 vector<DestroyableGroundObject*> SBomber::FindDestoyableGroundObjects() const
 {
@@ -242,7 +248,7 @@ GroundCommon* SBomber::FindGround() const
 vector<Bomb*> SBomber::FindAllBombs() const
 {
     std::vector<Bomb*> vecBombs;
-    ArrIterator<DynamicObject*, Bomb*> ait(vecDynamicObj);  // 1-Р№ РїР°СЂР°РјРµС‚СЂ С€Р°Р±Р»РѕРЅР° - РѕС‚РєСѓРґР° Р±РµСЂС‘Рј РѕР±СЉРµРєС‚С‹ ,  2-Р№ - РєСѓРґР° СЃРєР»Р°РґС‹РІР°РµРј
+    ArrIterator<DynamicObject*, Bomb*> ait(vecDynamicObj);  // 1-й параметр шаблона - откуда берём объекты ,  2-й - куда складываем
 
     Bomb* bom = nullptr;
     while (true)
@@ -395,9 +401,9 @@ void SBomber::DropBomb()
         double x = pPlane->GetX() + 4;
         double y = pPlane->GetY() + 2;
 
-        //Bomb* pBomb = new Bomb;          // "СЃС‚Р°СЂС‹Р№" РІРёРґ Р±РѕРјР±
-        BombDecoratorNewDraw* pBomb1 = new BombDecoratorNewDraw(new Bomb);   // "РЅРѕРІС‹Р№" РІРёРґ Р±РѕРјР± СЃ РґСЂСѓРіРѕР№ РїСЂРѕСЂРёСЃРѕРІРєРѕР№
-        BombDecoratorNewSpeed* pBomb = new BombDecoratorNewSpeed(pBomb1);       // "РЅРѕРІС‹Р№" РІРёРґ Р±РѕРјР± СЃ РґСЂСѓРіРѕР№ СЃРєРѕСЂРѕСЃС‚СЊСЋ
+        //Bomb* pBomb = new Bomb;          // "старый" вид бомб
+        BombDecoratorNewDraw* pBomb1 = new BombDecoratorNewDraw(new Bomb);   // "новый" вид бомб с другой прорисовкой
+        BombDecoratorNewSpeed* pBomb = new BombDecoratorNewSpeed(pBomb1);       // "новый" вид бомб с другой скоростью
 
         pBomb->SetDirection(0.3, 1);
         pBomb->SetSpeed(2);

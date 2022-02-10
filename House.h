@@ -20,7 +20,7 @@ private:
 	const uint16_t score = 40;
 };
 
-class HouseBuild : public DestroyableGroundObject {               // РѕР±С‰РёР№ РєР»Р°СЃСЃ СЃС‚СЂРѕРёС‚РµР»СЊ
+class HouseBuild : public DestroyableGroundObject {               // общий класс строитель
 public:
 	HouseBuild(double nx, double ny, uint16_t widthN) {
 		SetWidth(widthN);
@@ -32,19 +32,19 @@ private:
 	const uint16_t score = 40;
 };
 
-class HouseBody : public HouseBuild {                             // СЃС‚СЂРѕРёРј РєРѕСЂРїСѓСЃ РґРѕРјР°
+class HouseBody : public HouseBuild {                             // строим корпус дома
 public:
 	HouseBody(double nx, double ny, uint16_t widthN) : HouseBuild(nx, ny, widthN) {}
 	void Draw() const override;
 };
 
-class HouseChimney : public HouseBuild {                          // СЃС‚СЂРѕРёРј РґС‹РјРѕС…РѕРґРЅСѓСЋ С‚СЂСѓР±Сѓ
+class HouseChimney : public HouseBuild {                          // строим дымоходную трубу
 public:
 	HouseChimney(double nx, double ny, uint16_t widthN) : HouseBuild(nx, ny, widthN) {}
 	void Draw() const override;
 };
 
-class HouseWindow : public HouseBuild {                           // СЃС‚СЂРѕРёРј РѕРєРЅРѕ     
+class HouseWindow : public HouseBuild {                           // строим окно     
 public:
 	HouseWindow(double nx, double ny, uint16_t widthN) : HouseBuild(nx, ny, widthN) {}
 	void Draw() const override;
@@ -53,7 +53,7 @@ public:
 
 
 template <typename T>
-class Director {                             // СЃРѕР±РёСЂР°РµРј РІРµСЃСЊ РґРѕРј
+class Director {                             // собираем весь дом
 public:
 	std::vector<HouseBuild*> vv;
 	Director() { vv.clear(); }

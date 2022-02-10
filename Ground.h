@@ -27,7 +27,7 @@ private:
 
 //=============================================================================================================
 
-class GroundCommon : public GameObject {                   // Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ РєР»Р°СЃСЃ "Р·РµРјР»Рё"
+class GroundCommon : public GameObject {                   // абстрактный класс "земли"
 protected:
 	std::vector<Crater> vecCrates;
 public:
@@ -42,7 +42,7 @@ public:
 
 //=============================================================================================================
 
-class Ground : public GroundCommon                         // РєР»Р°СЃСЃ РїСЂРѕСЃС‚РѕР№ "Р·РµРјР»Рё"
+class Ground : public GroundCommon                         // класс простой "земли"
 {
 public:
 
@@ -52,7 +52,7 @@ public:
 
 //=============================================================================================================
 
-class WinterGround : public GroundCommon                   // РєР»Р°СЃСЃ Р·РёРјРЅРµР№ "Р·РµРјР»Рё"
+class WinterGround : public GroundCommon                   // класс зимней "земли"
 {
 public:
 

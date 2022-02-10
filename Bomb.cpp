@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <vector>
 
 #include "Bomb.h"
 #include "MyTools.h"
@@ -12,6 +13,11 @@ void Bomb::Draw() const
     MyTools::SetColor(CC_LightMagenta);
     GotoXY(x, y);
     cout << "*";
+}
+
+
+void Bomb::Accept(Visitor& v) {
+    v.log(this);
 }
 
 
